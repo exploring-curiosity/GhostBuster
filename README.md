@@ -1,5 +1,7 @@
 # GhostBuster
 
+Demo: [https://youtu.be/fRfk2Crlb3U](https://youtu.be/fRfk2Crlb3U)
+
 **AI-powered bug detection and auto-fix pipeline.** A user reports a bug through a Chrome extension — capturing a screenshot, DOM snapshot, and voice description — and an autonomous agent diagnoses the issue, fixes the code in a sandboxed environment, commits the fix, deploys it, and closes the GitHub issue. End to end, zero human code changes.
 
 ## How It Works
