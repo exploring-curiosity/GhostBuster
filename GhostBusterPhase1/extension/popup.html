@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>GhostBuster</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background: radial-gradient(circle at top, rgba(27,140,255,0.15), #030712);
+        color: #f8fafc;
+        width: 320px;
+        padding: 20px;
+      }
+      .header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+      .header h1 { font-size: 15px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(219,234,254,0.8); }
+      .dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; }
+      .dot.recording { background: #ef4444; animation: pulse 1s infinite; }
+      .dot.busy { background: #facc15; animation: pulse 0.5s infinite; }
+      @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+      #toggle {
+        width: 100%; border: none; border-radius: 12px;
+        padding: 14px 16px; font-size: 14px; font-weight: 600;
+        color: #fff; cursor: pointer; transition: all 0.2s;
+        background: linear-gradient(135deg, #1b8cff, #0f6bd9);
+      }
+      #toggle:hover { opacity: 0.9; }
+      #toggle:disabled { opacity: 0.5; cursor: not-allowed; }
+      #toggle.stop { background: linear-gradient(135deg, #ef4444, #dc2626); }
+      .status { margin-top: 12px; font-size: 12px; color: rgba(248,250,252,0.6); line-height: 1.5; }
+      .transcript-box {
+        margin-top: 12px; padding: 10px; border-radius: 8px;
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+        font-size: 12px; color: rgba(248,250,252,0.8); min-height: 40px;
+        max-height: 100px; overflow-y: auto; display: none;
+      }
+      .transcript-box.active { display: block; }
+      .settings-link {
+        display: block; margin-top: 12px; text-align: center;
+        font-size: 11px; color: rgba(248,250,252,0.4);
+        text-decoration: none;
+      }
+      .settings-link:hover { color: rgba(248,250,252,0.7); }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="dot" id="dot"></div>
+      <h1>GhostBuster</h1>
+    </div>
+    <button id="toggle">Start Capture</button>
+    <p class="status" id="status">Click to capture screenshot, DOM, and describe the bug with your voice.</p>
+    <div class="transcript-box" id="transcript"></div>
+    <a href="#" class="settings-link" id="openSettings">Settings</a>
+    <script src="popup.js"></script>
+  </body>
+</html>

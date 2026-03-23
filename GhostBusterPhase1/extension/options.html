@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>GhostBuster Settings</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        background: #040d1a;
+        color: #f8fafc;
+        padding: 24px;
+        max-width: 500px;
+      }
+      h1 { font-size: 20px; margin-bottom: 4px; }
+      .subtitle { color: rgba(248,250,252,0.5); font-size: 13px; margin-bottom: 24px; }
+      label {
+        display: block;
+        margin-bottom: 16px;
+        font-size: 13px;
+        color: rgba(248,250,252,0.7);
+      }
+      label span { display: block; margin-bottom: 4px; font-weight: 600; color: #f8fafc; }
+      input {
+        width: 100%;
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.15);
+        background: rgba(255,255,255,0.05);
+        color: #f8fafc;
+        font-size: 13px;
+        font-family: 'SF Mono', monospace;
+      }
+      input:focus { outline: none; border-color: #1b8cff; }
+      button {
+        padding: 12px 24px;
+        border-radius: 8px;
+        border: none;
+        background: #1b8cff;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      button:hover { opacity: 0.9; }
+      .saved { color: #4ade80; font-size: 13px; margin-top: 12px; }
+    </style>
+  </head>
+  <body>
+    <h1>GhostBuster Settings</h1>
+    <p class="subtitle">Configure your Gemini API key and Phase 2 agent backend.</p>
+    <form id="settings-form">
+      <label>
+        <span>Gemini API Key</span>
+        <input id="geminiApiKey" name="geminiApiKey" placeholder="AIzaSy..." required />
+      </label>
+      <label>
+        <span>Phase 2 Agent URL</span>
+        <input id="phase2Url" name="phase2Url" placeholder="http://localhost:3002" required />
+      </label>
+      <label>
+        <span>Phase 2 API Key</span>
+        <input id="phase2ApiKey" name="phase2ApiKey" placeholder="ghostbuster-test-key-2024" required />
+      </label>
+      <button type="submit">Save Settings</button>
+      <p class="saved" id="savedMsg" style="display:none"></p>
+    </form>
+    <script src="options.js"></script>
+  </body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>GhostBuster — Describe the Bug</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #030712; color: #f8fafc;
+      min-height: 100vh; display: flex; justify-content: center; padding: 32px;
+    }
+    .container { max-width: 720px; width: 100%; }
+    h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    h1 span { color: #34d399; }
+    .subtitle { color: rgba(248,250,252,0.5); font-size: 13px; margin-bottom: 24px; }
+    .screenshot-box {
+      width: 100%; border-radius: 12px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;
+      max-height: 300px;
+    }
+    .screenshot-box img { width: 100%; display: block; object-fit: cover; }
+    label { display: block; font-size: 13px; font-weight: 600; color: rgba(248,250,252,0.7); margin-bottom: 6px; }
+    textarea {
+      width: 100%; height: 120px; padding: 12px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04);
+      color: #f8fafc; font-size: 14px; resize: vertical; font-family: inherit;
+    }
+    textarea:focus { outline: none; border-color: #34d399; }
+    textarea::placeholder { color: rgba(248,250,252,0.3); }
+    .send-btn {
+      width: 100%; margin-top: 20px; padding: 14px; border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      background: linear-gradient(135deg, #34d399, #059669); color: #030712;
+    }
+    .send-btn:hover { opacity: 0.9; }
+    .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .status-bar {
+      margin-top: 16px; padding: 12px; border-radius: 10px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      font-size: 13px; color: rgba(248,250,252,0.6); display: none;
+    }
+    .status-bar.visible { display: block; }
+    .status-bar.success { border-color: rgba(52,211,153,0.3); color: #34d399; }
+    .status-bar.error { border-color: rgba(239,68,68,0.3); color: #fca5a5; }
+    .hint { margin-top: 8px; font-size: 11px; color: rgba(248,250,252,0.3); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Ghost<span>Buster</span> — Describe the Bug</h1>
+    <p class="subtitle">Voice recording failed. Type your bug description below instead.</p>
+    <div class="screenshot-box"><img id="screenshot" alt="Screenshot" /></div>
+    <label for="description">What's broken?</label>
+    <textarea id="description" placeholder="e.g. The View Projects button doesn't respond when I click on it"></textarea>
+    <p class="hint">Be specific: mention the element name, what you expected, and what actually happens.</p>
+    <button class="send-btn" id="sendBtn">Send to Agent</button>
+    <div class="status-bar" id="statusBar"></div>
+  </div>
+  <script src="capture.js"></script>
+</body>
+</html>
