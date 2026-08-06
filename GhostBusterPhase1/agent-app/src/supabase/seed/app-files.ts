@@ -86,8 +86,16 @@ export function ContactForm() {
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("sending");
-    // TODO: wire up API
-    setTimeout(() => setStatus("done"), 1200);
+    try {
+      await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      setStatus("done");
+    } catch {
+      setStatus("error");
+    }
   }
 
   return (
