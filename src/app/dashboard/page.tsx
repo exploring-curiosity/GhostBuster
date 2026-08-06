@@ -184,16 +184,23 @@ export default function Dashboard() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [steps, setSteps] = useState<AgentStep[]>([]);
   const [fix, setFix] = useState<Fix | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const stepsEndRef = useRef<HTMLDivElement>(null);
 
   const fetchData = useCallback(async (id?: string) => {
-    const url = id ? `/api/dashboard?id=${id}` : "/api/dashboard";
-    const res = await fetch(url);
-    const data = await res.json();
-    setDiagnoses(data.diagnoses);
-    if (id) {
-      setSteps(data.steps);
-      setFix(data.fix);
+    setError(null);
+    try {
+      const url = id ? `/api/dashboard?id=${id}` : "/api/dashboard";
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      const data = await res.json();
+      setDiagnoses(data.diagnoses);
+      if (id) {
+        setSteps(data.steps);
+        setFix(data.fix);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to fetch data");
     }
   }, []);
 
@@ -270,6 +277,13 @@ export default function Dashboard() {
           {diagnoses.length} diagnosis{diagnoses.length !== 1 ? "es" : ""}
         </span>
       </header>
+
+      {error && (
+        <div className="px-6 py-3 bg-red-950/50 border-b border-red-900/50 flex items-center gap-2">
+          <span className="text-red-400 text-sm">⚠️</span>
+          <span className="text-red-400 text-sm">{error}</span>
+        </div>
+      )}
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left Panel — Diagnosis Queue */}
