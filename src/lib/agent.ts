@@ -149,6 +149,16 @@ export async function runAgentStream(diagnosisId: string) {
   const systemPrompt = buildSystemPrompt(repoTree, diagnosis);
   const tools = createAgentTools(toolContext);
 
+  // Log initial step
+  await logAgentStep({
+    diagnosis_id: diagnosisId,
+    step_number: 0,
+    tool_name: "system",
+    reasoning: "Agent started. Analyzing bug diagnosis and preparing fix...",
+  });
+
+  let stepCounter = 0;
+
   const result = await streamText({
     model: google("gemini-2.5-flash"),
     system: systemPrompt,
@@ -168,6 +178,31 @@ export async function runAgentStream(diagnosisId: string) {
     ],
     tools,
     maxSteps: MAX_STEPS,
+    onStepFinish: async (step) => {
+      stepCounter++;
+      const toolCalls = step.toolCalls || [];
+      const toolResults = step.toolResults || [];
+      for (let i = 0; i < toolCalls.length; i++) {
+        const tc = toolCalls[i];
+        const tr = toolResults[i];
+        await logAgentStep({
+          diagnosis_id: diagnosisId,
+          step_number: stepCounter,
+          tool_name: tc.toolName,
+          tool_input: JSON.stringify(tc.args),
+          tool_output: tr ? JSON.stringify(tr.result) : undefined,
+          reasoning: step.text || undefined,
+        });
+      }
+      if (toolCalls.length === 0 && step.text) {
+        await logAgentStep({
+          diagnosis_id: diagnosisId,
+          step_number: stepCounter,
+          tool_name: "reasoning",
+          reasoning: step.text,
+        });
+      }
+    },
     onFinish: async () => {
       await teardownSandbox(sandbox);
     },
