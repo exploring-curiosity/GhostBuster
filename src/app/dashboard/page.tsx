@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
+import Image from "next/image";
 
 interface Diagnosis {
   id: string;
@@ -354,10 +355,13 @@ export default function Dashboard() {
                     </div>
                   </div>
                   {selected.screenshot_url && (
-                    <img
+                    <Image
                       src={selected.screenshot_url}
                       alt="Screenshot"
                       className="w-full rounded-lg border border-gray-700 mt-2"
+                      width={0}
+                      height={0}
+                      style={{ width: "100%", height: "auto" }}
                     />
                   )}
                 </div>
