@@ -13,7 +13,7 @@
  */
 
 const API_URL = process.env.API_URL || "http://localhost:3002";
-const API_KEY = process.env.API_KEY || "ghostbuster-test-key-2024";
+const API_KEY = process.env.DIAGNOSE_API_KEY || "ghostbuster-test-key-2024";
 
 const BUGS: Record<number, { description: string; component: string; root_cause: string; fix: string }> = {
   1: {
