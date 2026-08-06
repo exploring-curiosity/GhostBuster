@@ -248,7 +248,7 @@ export default function Dashboard() {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [selectedId, fetchData, hasSupabaseConfig]);
+  }, [selectedId, fetchData, hasSupabaseConfig, supabaseKey, supabaseUrl]);
 
   // Auto-scroll steps
   useEffect(() => {
