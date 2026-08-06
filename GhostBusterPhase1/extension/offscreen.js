@@ -15,16 +15,19 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 
   if (message.type === 'stop-recording') {
-    stopRecording().then(audioBase64 => sendResponse({ success: true, audioBase64 }))
+    stopRecording().then(result => sendResponse({ success: true, ...result }))
       .catch(err => sendResponse({ success: false, error: err.message }));
     return true;
   }
 });
 
+let recordingStartTime = null;
+
 async function startRecording() {
   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
   chunks = [];
   recorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
+  recordingStartTime = Date.now();
   recorder.ondataavailable = (e) => {
     if (e.data.size > 0) chunks.push(e.data);
   };
@@ -37,6 +40,9 @@ function stopRecording() {
       resolve('');
       return;
     }
+    const recordingDuration = recordingStartTime
+      ? (Date.now() - recordingStartTime) / 1000
+      : 0;
     recorder.onstop = async () => {
       try {
         const blob = new Blob(chunks, { type: 'audio/webm' });
@@ -46,7 +52,7 @@ function stopRecording() {
         recorder.stream.getTracks().forEach(t => t.stop());
         recorder = null;
         chunks = [];
-        resolve(base64);
+        resolve({ audioBase64: base64, recordingDuration: recordingDuration });
       } catch (err) {
         reject(err);
       }

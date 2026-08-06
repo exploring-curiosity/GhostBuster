@@ -191,14 +191,22 @@ async function stopAndAnalyze() {
   try {
     // Stop mic recording → get audio
     let audioBase64 = '';
+    let recordingDuration = 0;
     try {
       const audioResult = await sendToOffscreen({ type: 'stop-recording' });
       audioBase64 = audioResult?.audioBase64 || '';
+      recordingDuration = audioResult?.recordingDuration || 0;
     } catch (e) {
       console.warn('[GhostBuster] Offscreen audio failed:', e);
     }
     await closeOffscreen();
     console.log('[GhostBuster] Audio captured:', audioBase64 ? `${(audioBase64.length * 0.75 / 1024).toFixed(0)} KB` : 'EMPTY');
+
+    // Validate recording duration (1-30 seconds)
+    if (recordingDuration > 0 && (recordingDuration < 1 || recordingDuration > 30)) {
+      console.warn(`[GhostBuster] Recording duration ${recordingDuration.toFixed(1)}s is outside valid range (1-30s). Treating as empty.`);
+      audioBase64 = '';
+    }
 
     // If audio is empty or too small, use hardcoded demo fallback text
     if (!audioBase64 || audioBase64.length < 1000) {
