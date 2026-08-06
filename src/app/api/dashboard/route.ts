@@ -5,6 +5,10 @@ export async function GET(req: NextRequest) {
   const diagnosisId = req.nextUrl.searchParams.get("id");
   const sb = getSupabase();
 
+  if (!sb) {
+    return NextResponse.json({ diagnoses: [], steps: [], fix: null });
+  }
+
   // Fetch recent diagnoses
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: diagnoses } = await (sb.from("diagnoses") as any)

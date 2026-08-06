@@ -35,32 +35,35 @@ export async function POST(req: NextRequest) {
       const status = type === "deployment.ready" ? "success" : "failed";
 
       if (commitSha) {
-        // Find the fix record by commit SHA and update it
         const db = getSupabase();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: fix } = await (db.from("fixes") as any)
-          .select("id, diagnosis_id")
-          .eq("commit_sha", commitSha)
-          .single();
-
-        if (fix) {
-          const f = fix as { id: string; diagnosis_id: string };
+        if (!db) {
+          console.warn("[Webhook] Supabase not configured, skipping fix update");
+        } else {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (db.from("fixes") as any)
-            .update({
-              status,
-              deploy_url: deploymentUrl ? `https://${deploymentUrl}` : null,
-            })
-            .eq("id", f.id);
+          const { data: fix } = await (db.from("fixes") as any)
+            .select("id, diagnosis_id")
+            .eq("commit_sha", commitSha)
+            .single();
 
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (db.from("diagnoses") as any)
-            .update({
-              status: status === "success" ? "deployed" : "failed",
-            })
-            .eq("id", f.diagnosis_id);
+          if (fix) {
+            const f = fix as { id: string; diagnosis_id: string };
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await (db.from("fixes") as any)
+              .update({
+                status,
+                deploy_url: deploymentUrl ? `https://${deploymentUrl}` : null,
+              })
+              .eq("id", f.id);
 
-          console.log(`[Webhook] Updated fix ${f.id} → ${status}`);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await (db.from("diagnoses") as any)
+              .update({
+                status: status === "success" ? "deployed" : "failed",
+              })
+              .eq("id", f.diagnosis_id);
+
+            console.log(`[Webhook] Updated fix ${f.id} → ${status}`);
+          }
         }
       }
     }

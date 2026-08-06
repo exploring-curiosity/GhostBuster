@@ -3,11 +3,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 interface Diagnosis {
   id: string;
   status: string;
@@ -219,8 +214,15 @@ export default function Dashboard() {
     }
   }, [diagnoses, selectedId]);
 
-  // Supabase Realtime subscriptions
+  // Supabase Realtime subscriptions (skip if not configured)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const hasSupabaseConfig = !!supabaseUrl && !!supabaseKey;
+
   useEffect(() => {
+    if (!hasSupabaseConfig) return;
+
+    const supabase = createClient(supabaseUrl!, supabaseKey!);
     const channel = supabase
       .channel("dashboard-live")
       .on(
@@ -246,7 +248,7 @@ export default function Dashboard() {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [selectedId, fetchData]);
+  }, [selectedId, fetchData, hasSupabaseConfig]);
 
   // Auto-scroll steps
   useEffect(() => {
