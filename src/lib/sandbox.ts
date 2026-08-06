@@ -4,6 +4,25 @@ export type { Sandbox } from "@vercel/sandbox";
 
 const SANDBOX_TIMEOUT_MS = 5 * 60 * 1000;
 
+export type SpawnSandboxResult =
+  | { success: true; sandbox: Sandbox }
+  | { success: false; error: string };
+
+export async function spawnSandbox(
+  repoUrl: string,
+  githubToken?: string
+): Promise<SpawnSandboxResult> {
+  try {
+    const sandbox = await createSandbox(repoUrl, githubToken);
+    return { success: true, sandbox };
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Unknown sandbox spawn error";
+    console.error("[Sandbox] Failed to spawn sandbox:", message);
+    return { success: false, error: `Failed to spawn sandbox: ${message}` };
+  }
+}
+
 export async function createSandbox(
   repoUrl: string,
   githubToken?: string
