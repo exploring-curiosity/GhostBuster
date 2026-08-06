@@ -58,10 +58,23 @@ export async function POST(req: NextRequest) {
     }
 
     // Fire-and-forget: run the agent in the background
-    runAgent(diagnosisId).catch(async (err) => {
-      console.error("[Diagnose] Agent failed:", err);
+    try {
+      await runAgent(diagnosisId);
+    } catch (agentErr) {
+      console.error("[Diagnose] Agent failed:", agentErr);
       await updateDiagnosisStatus(diagnosisId, "failed").catch(() => {});
-    });
+      return NextResponse.json(
+        {
+          diagnosisId,
+          status: "failed",
+          error:
+            agentErr instanceof Error
+              ? agentErr.message
+              : "Unknown agent error",
+        },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       diagnosisId,
