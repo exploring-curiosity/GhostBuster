@@ -29,18 +29,15 @@ export async function POST(req: NextRequest) {
 
     const diagnosis = parsed.data;
 
-    // Upload screenshot to Supabase Storage
-    const screenshotUrl = await uploadScreenshot(
-      crypto.randomUUID(),
-      diagnosis.screenshot
-    );
-
-    // Store diagnosis in Supabase
+    // Store diagnosis in Supabase (generates the canonical ID)
     const diagnosisId = await createDiagnosis(
       "extension-user",
       diagnosis,
-      screenshotUrl
+      null
     );
+
+    // Upload screenshot to Supabase Storage using the diagnosis ID
+    const screenshotUrl = await uploadScreenshot(diagnosisId, diagnosis.screenshot);
 
     // Create GitHub issue with screenshot + diagnosis details
     try {
