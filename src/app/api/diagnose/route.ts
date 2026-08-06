@@ -40,8 +40,9 @@ export async function POST(req: NextRequest) {
     const screenshotUrl = await uploadScreenshot(diagnosisId, diagnosis.screenshot);
 
     // Create GitHub issue with screenshot + diagnosis details
+    let issueNumber: number | null = null;
     try {
-      const issueNumber = await createGitHubIssue({
+      issueNumber = await createGitHubIssue({
         diagnosisId,
         analysis: diagnosis.gemini_analysis,
         pageUrl: diagnosis.page_url,
@@ -52,6 +53,16 @@ export async function POST(req: NextRequest) {
       console.log(`[Diagnose] GitHub issue #${issueNumber} created`);
     } catch (issueErr) {
       console.error("[Diagnose] Failed to create GitHub issue:", issueErr);
+      return NextResponse.json(
+        {
+          diagnosisId,
+          error:
+            issueErr instanceof Error
+              ? issueErr.message
+              : "Unknown GitHub issue error",
+        },
+        { status: 500 }
+      );
     }
 
     // Fire-and-forget: run the agent in the background
