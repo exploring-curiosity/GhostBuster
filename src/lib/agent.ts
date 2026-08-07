@@ -43,7 +43,7 @@ ${repoTree.join("\n")}
 - Do NOT remove or alter comments unrelated to the bug`;
 }
 
-export async function runAgent(diagnosisId: string): Promise<void> {
+async function setupAgentContext(diagnosisId: string) {
   const diagnosis = await getDiagnosis(diagnosisId);
   if (!diagnosis) throw new Error(`Diagnosis ${diagnosisId} not found`);
 
@@ -52,25 +52,27 @@ export async function runAgent(diagnosisId: string): Promise<void> {
   const repoUrl = `https://github.com/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}.git`;
   const sandbox = await createSandbox(repoUrl, process.env.GITHUB_TOKEN);
 
-  const toolContext: ToolContext = {
-    sandbox,
-    diagnosisId,
-    filesChanged: [],
-  };
+  const toolContext: ToolContext = { sandbox, diagnosisId, filesChanged: [] };
+
+  const repoTree = await getRepoTree();
+  const systemPrompt = buildSystemPrompt(repoTree, diagnosis);
+  const tools = createAgentTools(toolContext);
+
+  await logAgentStep({
+    diagnosis_id: diagnosisId,
+    step_number: 0,
+    tool_name: "system",
+    reasoning: "Agent started. Analyzing bug diagnosis and preparing fix...",
+  });
+
+  return { sandbox, toolContext, systemPrompt, tools, diagnosis };
+}
+
+export async function runAgent(diagnosisId: string): Promise<void> {
+  const { sandbox, toolContext, systemPrompt, tools, diagnosis } =
+    await setupAgentContext(diagnosisId);
 
   try {
-    const repoTree = await getRepoTree();
-    const systemPrompt = buildSystemPrompt(repoTree, diagnosis);
-    const tools = createAgentTools(toolContext);
-
-    // Log initial step
-    await logAgentStep({
-      diagnosis_id: diagnosisId,
-      step_number: 0,
-      tool_name: "system",
-      reasoning: "Agent started. Analyzing bug diagnosis and preparing fix...",
-    });
-
     let stepCounter = 0;
 
     const result = await generateText({
@@ -131,31 +133,8 @@ export async function runAgent(diagnosisId: string): Promise<void> {
 }
 
 export async function runAgentStream(diagnosisId: string) {
-  const diagnosis = await getDiagnosis(diagnosisId);
-  if (!diagnosis) throw new Error(`Diagnosis ${diagnosisId} not found`);
-
-  await updateDiagnosisStatus(diagnosisId, "fixing");
-
-  const repoUrl = `https://github.com/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}.git`;
-  const sandbox = await createSandbox(repoUrl, process.env.GITHUB_TOKEN);
-
-  const toolContext: ToolContext = {
-    sandbox,
-    diagnosisId,
-    filesChanged: [],
-  };
-
-  const repoTree = await getRepoTree();
-  const systemPrompt = buildSystemPrompt(repoTree, diagnosis);
-  const tools = createAgentTools(toolContext);
-
-  // Log initial step
-  await logAgentStep({
-    diagnosis_id: diagnosisId,
-    step_number: 0,
-    tool_name: "system",
-    reasoning: "Agent started. Analyzing bug diagnosis and preparing fix...",
-  });
+  const { sandbox, toolContext, systemPrompt, tools, diagnosis } =
+    await setupAgentContext(diagnosisId);
 
   let stepCounter = 0;
 
