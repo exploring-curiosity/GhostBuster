@@ -81,6 +81,7 @@ async function main() {
         "X-API-Key": API_KEY,
       },
       body: JSON.stringify(diagnosis),
+      signal: AbortSignal.timeout(30_000),
     });
 
     const data = await res.json();
