@@ -4,6 +4,17 @@ export type { Sandbox } from "@vercel/sandbox";
 
 const SANDBOX_TIMEOUT_MS = 5 * 60 * 1000;
 
+const SAFE_PATH_REGEX = /^[a-zA-Z0-9/._-]+$/;
+
+function sanitizePath(path: string): string {
+  if (!SAFE_PATH_REGEX.test(path)) {
+    throw new Error(
+      `Unsafe file path: ${path}. Only alphanumeric characters, slashes, dots, hyphens, and underscores are allowed.`
+    );
+  }
+  return path;
+}
+
 export type SpawnSandboxResult =
   | { success: true; sandbox: Sandbox }
   | { success: false; error: string };
@@ -57,11 +68,12 @@ export async function writeFileInSandbox(
   path: string,
   content: string
 ): Promise<void> {
-  const cleanPath = path.replace(/^\//, "");
+  const cleanPath = sanitizePath(path.replace(/^\//, ""));
   const dir = cleanPath.substring(0, cleanPath.lastIndexOf("/"));
 
   // Ensure directory exists
   if (dir) {
+    sanitizePath(dir);
     await sandbox.runCommand("mkdir", ["-p", dir]);
   }
 
